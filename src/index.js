@@ -3,11 +3,17 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { AddUserPage } from './pages/AddUserPage'
+import * as apiCalls from './api/apiCalls';
+
+const actions = {
+  postSignup: apiCalls.signup
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <AddUserPage actions={actions} />
   </React.StrictMode>
 );
 
