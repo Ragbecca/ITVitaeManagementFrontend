@@ -1,23 +1,20 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { AddUserPage } from './pages/AddUserPage'
-import * as apiCalls from './api/apiCalls';
+import { createRoot } from 'react-dom/client';
+import './App.scss';
+import { BrowserRouter, HashRouter } from 'react-router-dom';
+import App from './containers/App';
+import { Provider } from 'react-redux';
+import configureStore from './redux/configureStore';
 
-const actions = {
-  postSignup: apiCalls.signup
-}
+const store = configureStore();
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const container = document.getElementById('root');
+const root = createRoot(container);
+
 root.render(
-  <React.StrictMode>
-    <AddUserPage actions={actions} />
-  </React.StrictMode>
+  <Provider store={store}>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>,
+  </Provider>,
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

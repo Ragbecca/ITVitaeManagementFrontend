@@ -1,0 +1,66 @@
+// App.scss
+// include customized bootstrap
+@import './scss/config';
+// include all of Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// define or include your other css below
+.display-4 {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+}
+
+#root {
+  height: 90%;
+}
+
+#inner-root {
+  height: 100%;
+}
+
+.blue-link {
+  padding: 16px 32px;
+  gap: 10px;
+
+  width: 114px;
+
+  background: $primary;
+  border-radius: 24px;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+  color: $white;
+}
+
+.blue-link:hover {
+  color: $white;
+  background-color: $primary-darker;
+}
+
+.orange-link-big {
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  width: 710px;
+  height: 83px;
+
+  background: $secondary;
+  border-radius: 50px;
+  font-family: 'Raleway', sans-serif;
+  font-size: xx-large;
+  font-weight: 700;
+  color: $white;
+}
+
+.orange-link-big:hover {
+  color: $white;
+  background-color: $secondary-darker;
+}

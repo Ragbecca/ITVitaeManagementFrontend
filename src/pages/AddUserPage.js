@@ -1,4 +1,6 @@
 import React from 'react';
+import ButtonWithProgress from '../components/ButtonWithProgress';
+import Input from '../components/Input';
 
 export class AddUserPage extends React.Component {
     state = {
@@ -7,27 +9,39 @@ export class AddUserPage extends React.Component {
         password: '',
         passwordRepeat: '',
         pendingApiCall: false,
-        errors: {}
+        errors: {},
+        passwordRepeatConfirmed: true
     };
 
     onChangeDisplayName = (event) => {
         const value = event.target.value;
-        this.setState({ displayName: value });
+        const errors = { ...this.state.errors };
+        delete errors.displayName;
+        this.setState({ displayName: value, errors });
     };
 
     onChangeUsername = (event) => {
         const value = event.target.value;
-        this.setState({ username: value });
+        const errors = { ...this.state.errors };
+        delete errors.username;
+        this.setState({ username: value, errors });
     };
 
     onChangePassword = (event) => {
         const value = event.target.value;
-        this.setState({ password: value });
+        const passwordRepeatConfirmed = this.state.passwordRepeat === value;
+        const errors = { ...this.state.errors };
+        delete errors.password;
+        errors.passwordRepeat = passwordRepeatConfirmed ? '' : 'Je wachtwoorden matchen niet.';
+        this.setState({ password: value, passwordRepeatConfirmed, errors });
     };
 
     onChangePasswordRepeat = (event) => {
         const value = event.target.value;
-        this.setState({ passwordRepeat: value });
+        const passwordRepeatConfirmed = this.state.password === value;
+        const errors = { ...this.state.errors }
+        errors.passwordRepeat = passwordRepeatConfirmed ? '' : 'Je wachtwoorden matchen niet.'
+        this.setState({ passwordRepeat: value, passwordRepeatConfirmed, errors });
     }
 
     onClickSignup = (event) => {
@@ -38,10 +52,11 @@ export class AddUserPage extends React.Component {
         }
         this.setState({ pendingApiCall: true })
         this.props.actions.postSignup(user).then((response) => {
-            this.setState({ pendingApiCall: false });
+            this.setState({ pendingApiCall: false }, () => {
+                this.props.history.push('/')
+            });
         })
             .catch((apiError) => {
-                console.log(apiError)
                 let errors = { ...this.state.errors }
                 if (apiError.response.data && apiError.response.data.validationErrors) {
                     errors = { ...apiError.response.data.validationErrors }
@@ -55,36 +70,54 @@ export class AddUserPage extends React.Component {
             <div className='container'>
                 <h1 className='text-center'>Maak een account aan</h1>
                 <div className='col-12 mb-3'>
-                    <label>Naam</label>
-                    <input className='form-control'
+                    <Input
+                        label="Naam"
                         placeholder='Naam'
                         value={this.state.displayName}
-                        onChange={this.onChangeDisplayName}>
-                    </input>
-                    {this.state.errors.displayName && <div className="alert alert-danger mt-2" role="alert"> {this.state.errors.displayName} </div>}
+                        onChange={this.onChangeDisplayName}
+                        hasError={this.state.errors.displayName && true}
+                        error={this.state.errors.displayName}>
+                    </Input>
                 </div>
                 <div>
-                    <label>Email</label>
-                    <input className='form-control' placeholder='Email' type="email" value={this.state.username} onChange={this.onChangeUsername}></input>
-                    {this.state.errors.username && <div className="alert alert-danger mt-2" role="alert"> {this.state.errors.username} </div>}
+                    <Input
+                        label="Email"
+                        placeholder='Email'
+                        type='email'
+                        value={this.state.username}
+                        onChange={this.onChangeUsername}
+                        hasError={this.state.errors.username && true}
+                        error={this.state.errors.username}>
+                    </Input>
                 </div>
                 <div>
-                    <label>Wachtwoord</label>
-                    <input className='form-control' placeholder='Wachtwoord' type="password" value={this.state.password} onChange={this.onChangePassword}></input>
-                    {this.state.errors.password && <div className="alert alert-danger mt-2" role="alert"> {this.state.errors.password} </div>}
+                    <Input
+                        label="Wachtwoord"
+                        placeholder='Wachtwoord'
+                        type="password"
+                        value={this.state.password}
+                        onChange={this.onChangePassword}
+                        hasError={this.state.errors.password && true}
+                        error={this.state.errors.password}>
+                    </Input>
                 </div>
                 <div>
-                    <label>Herhaling van Wachtwoord</label>
-                    <input className='form-control' placeholder='Herhaling van Wachtwoord' type="password" value={this.state.passwordRepeat} onChange={this.onChangePasswordRepeat}></input>
+                    <Input
+                        name="passwordRepeat"
+                        label="Herhaling van wachtwoord"
+                        placeholder="Herhaal je wachtwoord"
+                        type="password"
+                        value={this.state.passwordRepeat}
+                        onChange={this.onChangePasswordRepeat}
+                        hasError={this.state.errors.passwordRepeat && true}
+                        error={this.state.errors.passwordRepeat}>
+                    </Input>
                 </div>
                 <div className='text-center mt-1'>
-                    <button className='btn btn-primary' onClick={this.onClickSignup}
-                        disabled={this.state.pendingApiCall}>
-                        {this.state.pendingApiCall && (<div className='spinner-border text-light spinner-border-sm me-sm-1'>
-                            <span className='visually-hidden'>Loading...</span>
-                        </div>)}
-                        Maak account aan
-                    </button>
+                    <ButtonWithProgress onClick={this.onClickSignup}
+                        disabled={this.state.pendingApiCall || !this.state.passwordRepeatConfirmed}
+                        pendingApiCall={this.state.pendingApiCall}
+                        text="Maak Account" />
                 </div>
             </div >
         )
@@ -97,6 +130,9 @@ AddUserPage.defaultProps = {
         postSignup: () => new Promise((resolve, reject) => {
             resolve({});
         })
+    },
+    history: {
+        push: () => { }
     }
 }
 

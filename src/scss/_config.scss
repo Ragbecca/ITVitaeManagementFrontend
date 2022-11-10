@@ -1,0 +1,27 @@
+$primary: #207890;
+$secondary: #FF6D00;
+$primary-darker: #154d5c;
+$secondary-darker: #9e4402;
+$blue-white: #E8F7F8;
+$border-widths: (
+    1: 1px,
+    2: 2px,
+    3: 3px,
+    4: 4px,
+    5: 5px,
+    6: 6px,
+    7: 7px
+);
+$spacer: 1rem;
+$spacers: (
+    0: 0,
+    1: $spacer * .25,
+    2: $spacer * .5,
+    3: $spacer,
+    4: $spacer * 1.5,
+    5: $spacer * 3,
+    6: $spacer * 4,
+    7: $spacer * 5,
+    18: $spacer * 11,
+    19: $spacer * 11.5
+);
