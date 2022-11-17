@@ -1,13 +1,14 @@
 import React from 'react';
 
-const Input = (props) => {
+const InputDisabled = (props) => {
     let inputClassName = props.classes;
     if (props.type === 'file') {
         props.className += '-file';
-    };
+    }
     if (props.hasError !== undefined) {
         inputClassName += props.hasError ? ' is-invalid' : ' is-valid';
     };
+
 
     return (
         <div>
@@ -18,7 +19,7 @@ const Input = (props) => {
                 type={props.type || 'text'}
                 placeholder={props.placeholder}
                 value={props.value}
-                onChange={props.onChange}
+                disabled
             />
             {props.hasError && (
                 <span className="invalid-feedback">{props.error}</span>
@@ -27,8 +28,4 @@ const Input = (props) => {
     );
 };
 
-Input.defaultProps = {
-    onChange: () => { }
-};
-
-export default Input;
+export default InputDisabled;

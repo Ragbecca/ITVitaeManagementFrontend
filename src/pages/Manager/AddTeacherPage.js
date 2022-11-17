@@ -1,6 +1,6 @@
 import React from 'react';
-import ButtonWithProgress from '../components/ButtonWithProgress';
-import Input from '../components/Input';
+import ButtonWithProgress from '../../components/ButtonWithProgress';
+import Input from '../../components/Input';
 
 export class AddUserPage extends React.Component {
     state = {
@@ -51,9 +51,9 @@ export class AddUserPage extends React.Component {
             password: this.state.password
         }
         this.setState({ pendingApiCall: true })
-        this.props.actions.postSignup(user).then((response) => {
+        this.props.actions.postSignupTeacher(user).then((response) => {
             this.setState({ pendingApiCall: false }, () => {
-                this.props.history.push('/')
+                this.props.history.push('/manager/teachers')
             });
         })
             .catch((apiError) => {
@@ -127,7 +127,7 @@ export class AddUserPage extends React.Component {
 
 AddUserPage.defaultProps = {
     actions: {
-        postSignup: () => new Promise((resolve, reject) => {
+        postSignupTeacher: () => new Promise((resolve, reject) => {
             resolve({});
         })
     },

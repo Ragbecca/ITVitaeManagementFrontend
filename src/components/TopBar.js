@@ -36,12 +36,12 @@ class TopBar extends React.Component {
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link to="/login" className="nav-link blue-link text-center mx-2 align-middle">
+                        <Link to="/account" className="nav-link blue-link text-center mx-2 align-middle">
                             Account
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link to="/login" className="nav-link blue-link text-center mx-2 align-middle">
+                        <Link to="/manager/dashboard" className="nav-link blue-link text-center mx-2 align-middle">
                             Dashboard
                         </Link>
                     </li>

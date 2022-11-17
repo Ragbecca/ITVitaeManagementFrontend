@@ -1,8 +1,11 @@
-$primary: #207890;
+$primary: #00A7BE;
 $secondary: #FF6D00;
-$primary-darker: #154d5c;
+$primary-darker: #017a8c;
 $secondary-darker: #9e4402;
 $blue-white: #E8F7F8;
+$login-color: #D9D9D9;
+$gray-2: #4F4F4F;
+$gray-4: #BDBDBD;
 $border-widths: (
     1: 1px,
     2: 2px,
@@ -22,6 +25,7 @@ $spacers: (
     5: $spacer * 3,
     6: $spacer * 4,
     7: $spacer * 5,
+    10: $spacer * 7,
     18: $spacer * 11,
     19: $spacer * 11.5
 );
