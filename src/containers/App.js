@@ -11,11 +11,15 @@ import AuthenticatedRouteManager from '../components/AuthenticatedRouteManager';
 import DashboardManager from '../pages/Manager/DashboardManager'
 import Account from '../pages/Account';
 import TeacherListPage from '../pages/Manager/TeacherListPage';
+import AddStutendPage from '../pages/Manager/AddStudentPage';
+import AddGroupPage from '../pages/Manager/AddGroupPage';
 
 const actions = {
   postLogin: apiCalls.login,
   postSignupTeacher: apiCalls.signupTeacher,
-  postSignupManager: apiCalls.signupManager
+  postSignupManager: apiCalls.signupManager,
+  postStudent: apiCalls.createStudent,
+  postGroup: apiCalls.createGroup
 }
 
 function App() {
@@ -33,6 +37,8 @@ function App() {
           <AuthenticatedRouteManager path="/manager/teachers" exact component={TeacherListPage} />
           <AuthenticatedRouteManager path="/manager/teachers/create" exact component={(props) => <AddTeacherPage {...props} actions={actions} />} />
           <AuthenticatedRouteManager path="/manager/managers/create" exact component={(props) => <AddManagerPage {...props} actions={actions} />} />
+          <AuthenticatedRouteManager path="/manager/students/create" exact component={(props) => <AddStutendPage {...props} actions={actions} />} />
+          <AuthenticatedRouteManager path="/manager/groups/create" exact component={(props) => <AddGroupPage {...props} actions={actions} />} />
           <AuthenticatedRoute path="/account" exact component={Account} />
         </Switch>
       </div>

@@ -2,15 +2,13 @@ import React from 'react';
 import ButtonWithProgress from '../../components/ButtonWithProgress';
 import Input from '../../components/Input';
 
-export class AddUserPage extends React.Component {
+export class AddStutendPage extends React.Component {
     state = {
         displayName: '',
-        username: '',
-        password: '',
-        passwordRepeat: '',
+        email: '',
+        inClass: '',
         pendingApiCall: false,
         errors: {},
-        passwordRepeatConfirmed: true
     };
 
     onChangeDisplayName = (event) => {
@@ -27,33 +25,17 @@ export class AddUserPage extends React.Component {
         this.setState({ username: value, errors });
     };
 
-    onChangePassword = (event) => {
-        const value = event.target.value;
-        const passwordRepeatConfirmed = this.state.passwordRepeat === value;
-        const errors = { ...this.state.errors };
-        delete errors.password;
-        errors.passwordRepeat = passwordRepeatConfirmed ? '' : 'Je wachtwoorden matchen niet.';
-        this.setState({ password: value, passwordRepeatConfirmed, errors });
-    };
-
-    onChangePasswordRepeat = (event) => {
-        const value = event.target.value;
-        const passwordRepeatConfirmed = this.state.password === value;
-        const errors = { ...this.state.errors }
-        errors.passwordRepeat = passwordRepeatConfirmed ? '' : 'Je wachtwoorden matchen niet.'
-        this.setState({ passwordRepeat: value, passwordRepeatConfirmed, errors });
-    }
 
     onClickSignup = (event) => {
-        const user = {
+        const student = {
             username: this.state.username,
             displayName: this.state.displayName,
-            password: this.state.password
+            inClass: this.state.inClass
         }
         this.setState({ pendingApiCall: true })
-        this.props.actions.postSignupTeacher(user).then((response) => {
+        this.props.actions.postStudent(student).then((response) => {
             this.setState({ pendingApiCall: false }, () => {
-                this.props.history.push('/manager/teachers')
+                this.props.history.push('/manager/students')
             });
         })
             .catch((apiError) => {
@@ -68,7 +50,7 @@ export class AddUserPage extends React.Component {
     render() {
         return (
             <div className='container'>
-                <h1 className='text-center'>Maak een leraren-account aan</h1>
+                <h1 className='text-center'>Maak een account aan</h1>
                 <div className='col-12 mb-3'>
                     <Input
                         label="Naam"
@@ -91,27 +73,8 @@ export class AddUserPage extends React.Component {
                     </Input>
                 </div>
                 <div>
-                    <Input
-                        label="Wachtwoord"
-                        placeholder='Wachtwoord'
-                        type="password"
-                        value={this.state.password}
-                        onChange={this.onChangePassword}
-                        hasError={this.state.errors.password && true}
-                        error={this.state.errors.password}>
-                    </Input>
                 </div>
                 <div>
-                    <Input
-                        name="passwordRepeat"
-                        label="Herhaling van wachtwoord"
-                        placeholder="Herhaal je wachtwoord"
-                        type="password"
-                        value={this.state.passwordRepeat}
-                        onChange={this.onChangePasswordRepeat}
-                        hasError={this.state.errors.passwordRepeat && true}
-                        error={this.state.errors.passwordRepeat}>
-                    </Input>
                 </div>
                 <div className='text-center mt-1'>
                     <ButtonWithProgress onClick={this.onClickSignup}
@@ -125,9 +88,9 @@ export class AddUserPage extends React.Component {
 
 }
 
-AddUserPage.defaultProps = {
+AddStutendPage.defaultProps = {
     actions: {
-        postSignupTeacher: () => new Promise((resolve, reject) => {
+        postStudent: () => new Promise((resolve, reject) => {
             resolve({});
         })
     },
@@ -136,4 +99,4 @@ AddUserPage.defaultProps = {
     }
 }
 
-export default AddUserPage;
+export default AddStutendPage;

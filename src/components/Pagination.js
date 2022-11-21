@@ -10,7 +10,7 @@ const Pagination = ({ nPages, currentPage, setCurrentPage, setPageChanged }) => 
 
     function realPageRange(optimalArray) {
         let newArray = [];
-        if (currentPage == 1) {
+        if (currentPage === 1) {
             const tempOptimal = [currentPage, currentPage + 1, currentPage + 2];
             pageNumbers.forEach(element => {
                 if (tempOptimal.includes(element)) {
@@ -19,7 +19,7 @@ const Pagination = ({ nPages, currentPage, setCurrentPage, setPageChanged }) => 
             });
             return newArray;
         }
-        if (currentPage == nPages) {
+        if (currentPage === nPages) {
             const tempOptimal = [nPages - 2, nPages - 1, nPages];
             pageNumbers.forEach(element => {
                 if (tempOptimal.includes(element)) {
@@ -36,8 +36,8 @@ const Pagination = ({ nPages, currentPage, setCurrentPage, setPageChanged }) => 
         return newArray;
     }
 
-    const changePage = (pageNumber) => {
-        setCurrentPage(pageNumber);
+    const changePage = async (pageNumber) => {
+        await setCurrentPage(pageNumber);
         setPageChanged(true);
     }
 

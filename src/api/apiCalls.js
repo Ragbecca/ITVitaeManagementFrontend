@@ -13,6 +13,14 @@ export const login = (user) => {
     return axios.post('/login', {}, { auth: user });
 };
 
+export const createStudent = (student) => {
+    return axios.post('/manager/students/create', student);
+}
+
+export const createGroup = (group) => {
+    return axios.post('/manager/groups/create', group);
+}
+
 export const setAuthorizationHeader = ({ username, password, isLoggedIn }) => {
     if (isLoggedIn) {
         axios.defaults.headers.common['Authorization'] = `Basic ${btoa(

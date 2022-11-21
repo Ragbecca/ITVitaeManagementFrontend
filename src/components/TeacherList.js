@@ -17,7 +17,15 @@ const TeacherList = () => {
     const [isLoading, setLoading] = useState(true);
     const [isPageChanged, setPageChanged] = useState(false);
     const [isIndexAddNeeded, setIndexAddNeeded] = useState(false);
+    const [isSearchChanged, setSearchChanged] = useState(false);
+    const [search, setSearch] = useState('');
     let count = 0;
+
+
+    const handleSearch = (event) => {
+        setSearch(event.target.value);
+        setSearchChanged(true);
+    };
 
     useEffect(() => {
         async function initialUpdate() {
@@ -38,14 +46,29 @@ const TeacherList = () => {
             setData(newData);
             await refreshRecords();
         }
+        async function searchFunc() {
+            if (search.length < 2) {
+                setData(initialData);
+                setIndexAddNeeded(true);
+            } else {
+                const dataSearch = initialData.filter((value) => value.displayName.toLowerCase().includes(search.toLowerCase()));
+                setData(dataSearch);
+                console.log(data);
+                setIndexAddNeeded(true);
+            }
+            setSearchChanged(false);
+        }
         async function refreshRecords() {
-            setCurrentRecords(data.slice(indexOfFirstRecord, indexOfLastRecord));
+            setCurrentRecords(await data.slice(indexOfFirstRecord, indexOfLastRecord));
         }
         if (!isInitialCallDone) {
             initialUpdate();
         }
         if (isIndexAddNeeded) {
             addIndexes();
+        }
+        if (isSearchChanged) {
+            searchFunc();
         }
         if (isSortNameUpdate) {
             sorter();
@@ -64,10 +87,18 @@ const TeacherList = () => {
                     break;
             }
         }
+
         async function changePage() {
-            setIndexOfLastRecord(currentPage * recordsPerPage);
-            setIndexOfFirstRecord(indexOfLastRecord - recordsPerPage);
-            await addIndexes();
+            await funcIndexOfLastRecord();
+            await funcIndexOfFirstRecord();
+            setPageChanged(false);
+            addIndexes();
+        }
+        async function funcIndexOfLastRecord() {
+            setIndexOfLastRecord(await currentPage * recordsPerPage);
+        }
+        async function funcIndexOfFirstRecord() {
+            setIndexOfFirstRecord((currentPage * recordsPerPage) - recordsPerPage);
         }
         if (isPageChanged) {
             changePage();
@@ -96,7 +127,6 @@ const TeacherList = () => {
             setSortName("atoz");
             setSortNameToggled(true);
             setSortNameUpdate(true);
-            console.log(data);
         } else if (sortName.match("atoz")) {
             setSortName("ztoa")
             setSortNameToggled(true);
@@ -110,7 +140,7 @@ const TeacherList = () => {
 
     const [indexOfLastRecord, setIndexOfLastRecord] = useState(currentPage * recordsPerPage);
     const [indexOfFirstRecord, setIndexOfFirstRecord] = useState(indexOfLastRecord - recordsPerPage);
-    const [currentRecords, setCurrentRecords] = useState(data.slice(indexOfFirstRecord, indexOfLastRecord));
+    const [currentRecords, setCurrentRecords] = useState([]);
     const nPages = Math.ceil(data.length / recordsPerPage);
     let indexCount = 0;
 
@@ -130,7 +160,13 @@ const TeacherList = () => {
     return (
         <div className="d-flex justify-content-center align-items-center h-100 w-100">
             <div className="w-70">
-                <h3 className="poppins-bold text-primary" onClick={toggleSortName}>Alle Leraren</h3>
+                <div className="d-flex flex-row justify-content-between w-100">
+                    <h3 className="poppins-bold text-primary" onClick={toggleSortName}>Alle Leraren</h3>
+                    <label htmlFor="search" className="poppins-bold text-primary">
+                        Zoeken op naam:
+                        <input className="poppins-normal text-primary ms-2" id="search" type="text" onChange={handleSearch} />
+                    </label>
+                </div>
                 <table className="w-100 rounded-corners mb-2">
                     <thead className="">
                         <tr className="poppins-bold bg-primary text-white">

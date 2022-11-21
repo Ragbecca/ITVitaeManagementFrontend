@@ -201,3 +201,10 @@ table.rounded-corners tr:last-child td:first-child {
 table.rounded-corners tr:last-child td:last-child {
   border-bottom-right-radius: 5px;
 }
+
+.checklist-scroller {
+  height: 10rem;
+  width: fit-content;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
