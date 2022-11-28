@@ -8,7 +8,7 @@ const Pagination = ({ nPages, currentPage, setCurrentPage, setPageChanged }) => 
 
     const updatedRange = realPageRange(pageRangeOptimal);
 
-    function realPageRange(optimalArray) {
+    function realPageRange() {
         let newArray = [];
         if (currentPage === 1) {
             const tempOptimal = [currentPage, currentPage + 1, currentPage + 2];
@@ -38,7 +38,7 @@ const Pagination = ({ nPages, currentPage, setCurrentPage, setPageChanged }) => 
 
     const changePage = async (pageNumber) => {
         await setCurrentPage(pageNumber);
-        setPageChanged(true);
+        setPageChanged(a => !a);
     }
 
 

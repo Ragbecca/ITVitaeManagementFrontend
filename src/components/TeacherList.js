@@ -1,5 +1,5 @@
 import TeacherListItem from "./TeacherListItem";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Pagination from "./Pagination";
 import * as apiCalls from "../api/apiCalls"
 import { Link } from "react-router-dom";
@@ -8,67 +8,43 @@ const TeacherList = () => {
 
     const [recordsPerPage] = useState(7);
     const [currentPage, setCurrentPage] = useState(1);
-    const [initialData, setInitialData] = useState([]);
+    const isFirstRender = useRef(true);
     const [data, setData] = useState([]);
-    const [isInitialCallDone, setInitialCallDone] = useState(false);
-    const [isSortNameUpdate, setSortNameUpdate] = useState(false);
+    const [initialData, setInitialData] = useState([]);
+    const [isSearchUpdate, setSearchUpdate] = useState(false);
+    const [isSortUpdate, setSortUpdate] = useState(false);
     const [isSortNameToggled, setSortNameToggled] = useState(false);
     const [sortName, setSortName] = useState("none");
     const [isLoading, setLoading] = useState(true);
     const [isPageChanged, setPageChanged] = useState(false);
     const [isRefreshRecordsNeeded, setRefreshRecordsNeeded] = useState(false);
-    const [isSearchChanged, setSearchChanged] = useState(false);
     const [search, setSearch] = useState('');
+    const [dataState, setDataState] = useState('');
 
 
     const handleSearch = (event) => {
         setSearch(event.target.value);
-        setSearchChanged(true);
-        console.log("1" + isSearchChanged);
+        setSearchUpdate(true);
     };
 
     useEffect(() => {
+        if (isFirstRender.current) {
+            initialUpdate();
+        }
         async function initialUpdate() {
             await apiCalls.listTeachers().then(res => setInitialData(res.data),
                 setData(initialData),
                 setLoading(false));
-            setInitialCallDone(true);
-            setSortNameUpdate(true);
+            isFirstRender.current = false;
+            setSearchUpdate(true);
         }
-        if (isSearchChanged) {
-            searchFunc();
-        }
-        async function refreshRecords() {
-            setCurrentRecords(await data.slice(indexOfFirstRecord, indexOfLastRecord));
-        }
-        if (!isInitialCallDone) {
-            initialUpdate();
-        }
-        if (isRefreshRecordsNeeded) {
-            refreshRecords();
-        }
-        if (isSortNameUpdate) {
-            sorter();
-        }
-        async function sorter() {
-            setSortNameUpdate(false);
-            switch (sortName) {
-                case "atoz":
-                    await sortAToZDName();
-                    break;
-                case "ztoa":
-                    await sortZToADName();
-                    break;
-                default:
-                    await resetSort();
-                    break;
-            }
-        }
+    }, [isFirstRender]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
         async function changePage() {
             await funcIndexOfLastRecord();
             await funcIndexOfFirstRecord();
-            setPageChanged(false);
-            await refreshRecords();
+            setRefreshRecordsNeeded(true);
         }
         async function funcIndexOfLastRecord() {
             setIndexOfLastRecord(await currentPage * recordsPerPage);
@@ -76,11 +52,14 @@ const TeacherList = () => {
         async function funcIndexOfFirstRecord() {
             setIndexOfFirstRecord((currentPage * recordsPerPage) - recordsPerPage);
         }
-        if (isPageChanged) {
+        if (isPageChanged === true) {
+            setPageChanged(false);
             changePage();
         }
-        async function searchFunc() {
-            setSearchChanged(false);
+    }, [isPageChanged]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        async function searcher() {
             if (search.length < 2) {
                 setData(initialData);
             } else {
@@ -93,41 +72,88 @@ const TeacherList = () => {
                 });
                 setData(dataSearch);
             }
-            console.log("2" + isSearchChanged);
         }
-    });
+        async function updaterSearcherAndSorter() {
+            setDataState("searching");
+            await searcher();
+        }
+        if (isSearchUpdate === true) {
+            setSearchUpdate(false);
+            updaterSearcherAndSorter();
+        }
+    }, [isSearchUpdate]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        async function sorter() {
+            switch (sortName) {
+                case "atoz":
+                    await sortAToZDName();
+                    break;
+                case "ztoa":
+                    await sortZToADName();
+                    break;
+                default:
+                    await resetSort();
+                    break;
+            }
+        }
+        if (isSortUpdate === true) {
+            setDataState("sorting");
+            setSortUpdate(false);
+            sorter();
+        }
+    }, [isSortUpdate]); // eslint-disable-line react-hooks/exhaustive-deps
+
+
+    useEffect(() => {
+        async function refreshRecords() {
+            setCurrentRecords(data.slice(indexOfFirstRecord, indexOfLastRecord));
+        }
+        if (isRefreshRecordsNeeded === true) {
+            setRefreshRecordsNeeded(false);
+            refreshRecords();
+        }
+    }, [isRefreshRecordsNeeded]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        console.log(dataState);
+        if (dataState === "searching") {
+            setSortUpdate(true);
+            console.log("HERE!");
+        } else if (dataState === "sorting") {
+            setRefreshRecordsNeeded(true);
+        }
+    }, [dataState]); // eslint-disable-line react-hooks/exhaustive-deps
 
     async function sortAToZDName() {
-        const newData = data.sort((a, b) => b.displayName.localeCompare(a.displayName))
+        const newData = data.sort((a, b) => b.displayName.localeCompare(a.displayName));
         setData(newData);
-        await setRefreshRecordsNeeded(true);
     }
 
     async function resetSort() {
-        setData(initialData);
-        setSearchChanged(true);
-        await setRefreshRecordsNeeded(true);
+        const newData = data.sort((a, b) => a.id - b.id);
+        setData(newData);
     }
 
     async function sortZToADName() {
-        const newData = data.sort((a, b) => a.displayName.localeCompare(b.displayName))
+        const newData = data.sort((a, b) => a.displayName.localeCompare(b.displayName));
         setData(newData);
-        await setRefreshRecordsNeeded(true);
     }
 
     function toggleSortName() {
+        console.log(sortName);
         if (sortName.match("none")) {
             setSortName("atoz");
             setSortNameToggled(true);
-            setSortNameUpdate(true);
+            setSearchUpdate(true);
         } else if (sortName.match("atoz")) {
             setSortName("ztoa")
             setSortNameToggled(true);
-            setSortNameUpdate(true);
+            setSearchUpdate(true);
         } else if (sortName.match("ztoa")) {
             setSortName("none");
             setSortNameToggled(false);
-            setSortNameUpdate(true);
+            setSearchUpdate(true);
         }
     }
 
