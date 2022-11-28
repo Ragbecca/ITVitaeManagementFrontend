@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import TeacherInputItem from './TeacherInputItem';
 import * as apiCalls from "../api/apiCalls"
 
-const TeacherInputList = () => {
+const TeacherInputList = (props) => {
 
     const [teacherList, setTeacherList] = useState([]);
     const [initialCall, setInitialCall] = useState(true);
     const [isLoading, setLoading] = useState(true);
     const [checked, setChecked] = useState([]);
+    const { onChangeValue } = props;
+
 
     const handleCheck = (event) => {
         var updatedList = [...checked];
@@ -17,6 +19,7 @@ const TeacherInputList = () => {
             updatedList.splice(checked.indexOf(event.target.value), 1);
         }
         setChecked(updatedList);
+        onChangeValue(updatedList);
     };
 
     const checkedItems = checked.length
@@ -54,9 +57,6 @@ const TeacherInputList = () => {
                         return <TeacherInputItem key={teacher.id} teacher={teacher} handleCheck={handleCheck} />;
                     })
                 }
-            </div>
-            <div>
-                {`Items checked are: ${checkedItems}`}
             </div>
         </div>
     )

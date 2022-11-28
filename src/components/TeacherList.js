@@ -16,15 +16,15 @@ const TeacherList = () => {
     const [sortName, setSortName] = useState("none");
     const [isLoading, setLoading] = useState(true);
     const [isPageChanged, setPageChanged] = useState(false);
-    const [isIndexAddNeeded, setIndexAddNeeded] = useState(false);
+    const [isRefreshRecordsNeeded, setRefreshRecordsNeeded] = useState(false);
     const [isSearchChanged, setSearchChanged] = useState(false);
     const [search, setSearch] = useState('');
-    let count = 0;
 
 
     const handleSearch = (event) => {
         setSearch(event.target.value);
         setSearchChanged(true);
+        console.log("1" + isSearchChanged);
     };
 
     useEffect(() => {
@@ -35,28 +35,8 @@ const TeacherList = () => {
             setInitialCallDone(true);
             setSortNameUpdate(true);
         }
-        async function addIndexes() {
-            setIndexAddNeeded(false);
-            let newData = [];
-            data.forEach(element => {
-                count += 1;
-                element = { ...element, index: count };
-                newData.push(element);
-            });
-            setData(newData);
-            await refreshRecords();
-        }
-        async function searchFunc() {
-            if (search.length < 2) {
-                setData(initialData);
-                setIndexAddNeeded(true);
-            } else {
-                const dataSearch = initialData.filter((value) => value.displayName.toLowerCase().includes(search.toLowerCase()));
-                setData(dataSearch);
-                console.log(data);
-                setIndexAddNeeded(true);
-            }
-            setSearchChanged(false);
+        if (isSearchChanged) {
+            searchFunc();
         }
         async function refreshRecords() {
             setCurrentRecords(await data.slice(indexOfFirstRecord, indexOfLastRecord));
@@ -64,11 +44,8 @@ const TeacherList = () => {
         if (!isInitialCallDone) {
             initialUpdate();
         }
-        if (isIndexAddNeeded) {
-            addIndexes();
-        }
-        if (isSearchChanged) {
-            searchFunc();
+        if (isRefreshRecordsNeeded) {
+            refreshRecords();
         }
         if (isSortNameUpdate) {
             sorter();
@@ -77,22 +54,21 @@ const TeacherList = () => {
             setSortNameUpdate(false);
             switch (sortName) {
                 case "atoz":
-                    await sortAToZDN();
+                    await sortAToZDName();
                     break;
                 case "ztoa":
-                    await sortZToADN();
+                    await sortZToADName();
                     break;
                 default:
-                    await resetSortDN();
+                    await resetSort();
                     break;
             }
         }
-
         async function changePage() {
             await funcIndexOfLastRecord();
             await funcIndexOfFirstRecord();
             setPageChanged(false);
-            addIndexes();
+            await refreshRecords();
         }
         async function funcIndexOfLastRecord() {
             setIndexOfLastRecord(await currentPage * recordsPerPage);
@@ -103,23 +79,40 @@ const TeacherList = () => {
         if (isPageChanged) {
             changePage();
         }
+        async function searchFunc() {
+            setSearchChanged(false);
+            if (search.length < 2) {
+                setData(initialData);
+            } else {
+                let dataSearch = initialData.filter((value) => value.displayName.toLowerCase().includes(search.toLowerCase()));
+                const dataSearchEmail = initialData.filter((value) => value.username.toLowerCase().includes(search.toLowerCase()));
+                dataSearchEmail.forEach(element => {
+                    if (!dataSearch.includes(element)) {
+                        dataSearch.push(element);
+                    }
+                });
+                setData(dataSearch);
+            }
+            console.log("2" + isSearchChanged);
+        }
     });
 
-    async function sortAToZDN() {
-        const newData = data.sort((a, b) => a.displayName.localeCompare(b.displayName))
-        setData(newData);
-        setIndexAddNeeded(true);
-    }
-
-    async function resetSortDN() {
-        setData(initialData);
-        setIndexAddNeeded(true);
-    }
-
-    async function sortZToADN() {
+    async function sortAToZDName() {
         const newData = data.sort((a, b) => b.displayName.localeCompare(a.displayName))
         setData(newData);
-        setIndexAddNeeded(true);
+        await setRefreshRecordsNeeded(true);
+    }
+
+    async function resetSort() {
+        setData(initialData);
+        setSearchChanged(true);
+        await setRefreshRecordsNeeded(true);
+    }
+
+    async function sortZToADName() {
+        const newData = data.sort((a, b) => a.displayName.localeCompare(b.displayName))
+        setData(newData);
+        await setRefreshRecordsNeeded(true);
     }
 
     function toggleSortName() {
@@ -163,7 +156,7 @@ const TeacherList = () => {
                 <div className="d-flex flex-row justify-content-between w-100">
                     <h3 className="poppins-bold text-primary" onClick={toggleSortName}>Alle Leraren</h3>
                     <label htmlFor="search" className="poppins-bold text-primary">
-                        Zoeken op naam:
+                        Zoeken:
                         <input className="poppins-normal text-primary ms-2" id="search" type="text" onChange={handleSearch} />
                     </label>
                 </div>
@@ -181,12 +174,8 @@ const TeacherList = () => {
                         {
                             currentRecords.map((user) => {
                                 let index = 0;
-                                if (user.index === undefined) {
-                                    indexCount += 1;
-                                    index = indexCount;
-                                } else {
-                                    index = user.index;
-                                }
+                                indexCount += 1;
+                                index = indexCount * currentPage;
                                 return <TeacherListItem key={user.username} user={user} index={index} />;
                             })
                         }
