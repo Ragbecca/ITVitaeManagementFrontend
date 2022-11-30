@@ -116,10 +116,8 @@ const TeacherList = () => {
     }, [isRefreshRecordsNeeded]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        console.log(dataState);
         if (dataState === "searching") {
             setSortUpdate(true);
-            console.log("HERE!");
         } else if (dataState === "sorting") {
             setRefreshRecordsNeeded(true);
         }
@@ -141,7 +139,6 @@ const TeacherList = () => {
     }
 
     function toggleSortName() {
-        console.log(sortName);
         if (sortName.match("none")) {
             setSortName("atoz");
             setSortNameToggled(true);
